@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.recast4j.detour.MeshData;
+import org.recast4j.detour.NavMesh;
 import org.recast4j.detour.NavMeshBuilder;
 import org.recast4j.detour.NavMeshDataCreateParams;
 import org.recast4j.dynamic.collider.Collider;
@@ -45,6 +46,7 @@ class DynamicTile {
     MeshData meshData;
     private final Map<Long, Collider> colliders = new ConcurrentHashMap<>();
     private boolean dirty = true;
+    private long id;
 
     DynamicTile(VoxelTile voxelTile) {
         this.voxelTile = voxelTile;
@@ -52,28 +54,27 @@ class DynamicTile {
 
     boolean build(RecastBuilder builder, DynamicNavMeshConfig config, Telemetry telemetry) {
         if (dirty) {
-            VoxelTile vt = checkpoint != null ? checkpoint.voxelTile : voxelTile;
-            Collection<Long> cpColliders = checkpoint != null ? checkpoint.colliders : Collections.emptySet();
-            Heightfield heightfield = buildHeightfield(config, vt, cpColliders, telemetry);
-            RecastBuilderResult r = buildRecast(builder, config, vt, heightfield, telemetry);
-            NavMeshDataCreateParams params = navMeshCreateParams(vt.tileX, vt.tileZ, vt.cellSize, vt.cellHeight, config, r);
+            Heightfield heightfield = buildHeightfield(config, telemetry);
+            RecastBuilderResult r = buildRecast(builder, config, voxelTile, heightfield, telemetry);
+            NavMeshDataCreateParams params = navMeshCreateParams(voxelTile.tileX, voxelTile.tileZ, voxelTile.cellSize,
+                    voxelTile.cellHeight, config, r);
             meshData = NavMeshBuilder.createNavMeshData(params);
             return true;
         }
         return false;
     }
 
-    private Heightfield buildHeightfield(DynamicNavMeshConfig config, VoxelTile vt, Collection<Long> rasterizedColliders,
-            Telemetry telemetry) {
-        Heightfield heightfield = vt.heightfield();
+    private Heightfield buildHeightfield(DynamicNavMeshConfig config, Telemetry telemetry) {
+        Collection<Long> rasterizedColliders = checkpoint != null ? checkpoint.colliders : Collections.emptySet();
+        Heightfield heightfield = checkpoint != null ? checkpoint.heightfield : voxelTile.heightfield();
         colliders.forEach((id, c) -> {
             if (!rasterizedColliders.contains(id)) {
+                heightfield.bmax[1] = Math.max(heightfield.bmax[1], c.bounds()[4] + heightfield.ch * 2);
                 c.rasterize(heightfield, telemetry);
             }
         });
-        if (config.enableCheckpoints && !colliders.isEmpty()) {
-            checkpoint = new DynamicTileCheckpoint(new VoxelTile(vt.tileX, vt.tileZ, heightfield),
-                    new HashSet<>(colliders.keySet()));
+        if (config.enableCheckpoints) {
+            checkpoint = new DynamicTileCheckpoint(heightfield, new HashSet<>(colliders.keySet()));
         }
         return heightfield;
     }
@@ -152,4 +153,12 @@ class DynamicTile {
         return params;
     }
 
+    void addTo(NavMesh navMesh) {
+        if (meshData != null) {
+            id = navMesh.addTile(meshData, 0, 0);
+        } else {
+            navMesh.removeTile(id);
+            id = 0;
+        }
+    }
 }

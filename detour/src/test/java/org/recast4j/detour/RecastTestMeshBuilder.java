@@ -17,7 +17,6 @@ freely, subject to the following restrictions:
 */
 package org.recast4j.detour;
 
-import org.recast4j.recast.ObjImporter;
 import org.recast4j.recast.PolyMesh;
 import org.recast4j.recast.PolyMeshDetail;
 import org.recast4j.recast.RecastBuilder;
@@ -45,8 +44,8 @@ public class RecastTestMeshBuilder {
     private final static float m_detailSampleMaxError = 1.0f;
 
     public RecastTestMeshBuilder() {
-        this(new ObjImporter().load(ObjImporter.class.getResourceAsStream("dungeon.obj")), PartitionType.WATERSHED,
-                m_cellSize, m_cellHeight, m_agentHeight, m_agentRadius, m_agentMaxClimb, m_agentMaxSlope,
+        this(new ObjImporter().load(RecastTestMeshBuilder.class.getClassLoader().getResourceAsStream("dungeon.obj")),
+                PartitionType.WATERSHED, m_cellSize, m_cellHeight, m_agentHeight, m_agentRadius, m_agentMaxClimb, m_agentMaxSlope,
                 m_regionMinSize, m_regionMergeSize, m_edgeMaxLen, m_edgeMaxError, m_vertsPerPoly, m_detailSampleDist,
                 m_detailSampleMaxError);
     }

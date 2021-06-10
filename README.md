@@ -1,7 +1,10 @@
+![Build Status](https://img.shields.io/github/workflow/status/ppiastucki/recast4j/Java%20CI/master?logo=github)
+![Repo Size](https://img.shields.io/github/repo-size/ppiastucki/recast4j.svg?colorB=lightgray)
+[![Maven Central](https://img.shields.io/maven-central/v/org.recast4j/recast.svg?label=maven%20central)](https://search.maven.org/search?q=g:org.recast4j)
+[![Travis Build](https://travis-ci.org/ppiastucki/recast4j.svg?branch=master)](https://travis-ci.org/ppiastucki/recast4j)
+
 Recast4j
 ========
-
-[![Build Status](https://travis-ci.org/ppiastucki/recast4j.svg?branch=master)](https://travis-ci.org/ppiastucki/recast4j)
 
 Java Port of Recast and Detour navigation mesh toolset.
 
@@ -41,7 +44,6 @@ You can find a lot of examples in tests e.g.
 - finding a path: https://github.com/ppiastucki/recast4j/blob/master/detour/src/test/java/org/recast4j/detour/FindPathTest.java#L94
 - persisting a nav mesh: https://github.com/ppiastucki/recast4j/blob/master/detour/src/test/java/org/recast4j/detour/io/MeshSetReaderWriterTest.java
 - dynamic nav mesh: https://github.com/ppiastucki/recast4j/blob/master/detour-dynamic/src/test/java/org/recast4j/dynamic/DynamicNavMeshTest.java
-### Recast Demo
 ### Java Version Enhancements
 #### recast
 - out-of-the-box support for multi-threaded builds
@@ -55,7 +57,20 @@ You can find a lot of examples in tests e.g.
 #### detour-dynamic
 - robust support for dynamic nav meshes combining pre-built voxels with dynamic objects which can be freely added and removed
 
-### Maven
+### Building from Source
+
+All the modules can be built with a single gradle command:
+```
+./gradlew clean build shadow
+```
+
+Once the build is completed, the recast-demo application can be run as follows:
+```
+java -jar ./recast-demo/build/libs/recast-demo-1.5.1-SNAPSHOT-all.jar
+```
+
+### Binaries
+
 #### Releases
 Recast4j releases are available in Maven Central Repository.
 The project includes 4 artifacts:
@@ -63,32 +78,32 @@ The project includes 4 artifacts:
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>recast</artifactId>
-	<version>1.3.2</version>
+	<version>1.5.0</version>
 </dependency>
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>detour</artifactId>
-	<version>1.3.2</version>
+	<version>1.5.0</version>
 </dependency>
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>detour-crowd</artifactId>
-	<version>1.2.3</version>
+	<version>1.5.0</version>
 </dependency>
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>detour-tile-cache</artifactId>
-	<version>1.3.2</version>
+	<version>1.5.0</version>
 </dependency>
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>detour-extras</artifactId>
-	<version>1.3.2</version>
+	<version>1.5.0</version>
 </dependency>
 <dependency>
 	<groupId>org.recast4j</groupId>
 	<artifactId>detour-dynamic</artifactId>
-	<version>1.3.2</version>
+	<version>1.5.0</version>
 </dependency>
 ```
 

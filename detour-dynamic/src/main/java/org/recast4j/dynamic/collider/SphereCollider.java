@@ -19,7 +19,7 @@ freely, subject to the following restrictions:
 package org.recast4j.dynamic.collider;
 
 import org.recast4j.recast.Heightfield;
-import org.recast4j.recast.RecastShapeRasterization;
+import org.recast4j.recast.RecastFilledVolumeRasterization;
 import org.recast4j.recast.Telemetry;
 
 public class SphereCollider extends AbstractCollider {
@@ -35,7 +35,7 @@ public class SphereCollider extends AbstractCollider {
 
     @Override
     public void rasterize(Heightfield hf, Telemetry telemetry) {
-        RecastShapeRasterization.rasterizeSphere(hf, center, radius, area, (int) Math.floor(flagMergeThreshold / hf.ch),
+        RecastFilledVolumeRasterization.rasterizeSphere(hf, center, radius, area, (int) Math.floor(flagMergeThreshold / hf.ch),
                 telemetry);
     }
 

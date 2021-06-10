@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -37,6 +38,8 @@ import org.recast4j.detour.NavMeshDataCreateParams;
 import org.recast4j.detour.NavMeshParams;
 import org.recast4j.dynamic.collider.Collider;
 import org.recast4j.dynamic.io.VoxelFile;
+import org.recast4j.dynamic.io.VoxelTile;
+import org.recast4j.recast.Heightfield;
 import org.recast4j.recast.RecastBuilder;
 import org.recast4j.recast.RecastBuilder.RecastBuilderResult;
 import org.recast4j.recast.Telemetry;
@@ -87,8 +90,15 @@ public class DynamicNavMesh {
         return navMesh;
     }
 
-    public List<RecastBuilderResult> recastResults() {
-        return tiles.values().stream().map(t -> t.recastResult).collect(toList());
+    /**
+     * Voxel queries require checkpoints to be enabled in {@link DynamicNavMeshConfig}
+     */
+    public VoxelQuery voxelQuery() {
+        return new VoxelQuery(navMeshParams.orig, navMeshParams.tileWidth, navMeshParams.tileHeight, this::lookupHeightfield);
+    }
+
+    private Optional<Heightfield> lookupHeightfield(int x, int z) {
+        return Optional.ofNullable(getTileAt(x, z)).map(t -> t.checkpoint).map(c -> c.heightfield);
     }
 
     public long addCollider(Collider collider) {
@@ -196,7 +206,7 @@ public class DynamicNavMesh {
     private boolean updateNavMesh() {
         if (dirty) {
             NavMesh navMesh = new NavMesh(navMeshParams, MAX_VERTS_PER_POLY);
-            tiles.values().forEach(t -> navMesh.addTile(t.meshData, 0, 0));
+            tiles.values().forEach(t -> t.addTo(navMesh));
             this.navMesh = navMesh;
             dirty = false;
             return true;
@@ -210,6 +220,14 @@ public class DynamicNavMesh {
 
     private long lookupKey(long x, long z) {
         return (z << 32) | x;
+    }
+
+    public List<VoxelTile> voxelTiles() {
+        return tiles.values().stream().map(t -> t.voxelTile).collect(toList());
+    }
+
+    public List<RecastBuilderResult> recastResults() {
+        return tiles.values().stream().map(t -> t.recastResult).collect(toList());
     }
 
 }

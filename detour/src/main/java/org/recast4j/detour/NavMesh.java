@@ -302,9 +302,9 @@ public class NavMesh {
             float maxy = clamp(qmax[1], tbmin[1], tbmax[1]) - tbmin[1];
             float maxz = clamp(qmax[2], tbmin[2], tbmax[2]) - tbmin[2];
             // Quantize
-            bmin[0] = (int) (qfac * minx) & 0xfffe;
-            bmin[1] = (int) (qfac * miny) & 0xfffe;
-            bmin[2] = (int) (qfac * minz) & 0xfffe;
+            bmin[0] = (int) (qfac * minx) & 0x7ffffffe;
+            bmin[1] = (int) (qfac * miny) & 0x7ffffffe;
+            bmin[2] = (int) (qfac * minz) & 0x7ffffffe;
             bmax[0] = (int) (qfac * maxx + 1) | 1;
             bmax[1] = (int) (qfac * maxy + 1) | 1;
             bmax[2] = (int) (qfac * maxz + 1) | 1;
@@ -524,7 +524,7 @@ public class NavMesh {
 
         tile.flags = 0;
         tile.links.clear();
-		tile.linksFreeList=NavMesh.DT_NULL_LINK;
+        tile.linksFreeList=NavMesh.DT_NULL_LINK;
 
         // Update salt, salt should never be zero.
         tile.salt = (tile.salt + 1) & ((1 << DT_SALT_BITS) - 1);
@@ -697,8 +697,7 @@ public class NavMesh {
             Poly targetPoly = target.data.polys[targetCon.poly];
             // Skip off-mesh connections which start location could not be
             // connected at all.
-            if (tile.polyLinks[targetPoly.index] == DT_NULL_LINK) {
-//            if (targetPoly.firstLink == DT_NULL_LINK) {
+            if (target.polyLinks[targetPoly.index] == DT_NULL_LINK) {
                 continue;
             }
 
@@ -734,8 +733,8 @@ public class NavMesh {
             link.side = oppositeSide;
             link.bmin = link.bmax = 0;
             // Add to linked list.
-            link.next = tile.polyLinks[targetPoly.index];
-            tile.polyLinks[targetPoly.index] = idx;
+            link.next = target.polyLinks[targetPoly.index];
+            target.polyLinks[targetPoly.index] = idx;
 
             // Link target poly to off-mesh connection.
             if ((targetCon.flags & DT_OFFMESH_CON_BIDIR) != 0) {

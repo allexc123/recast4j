@@ -54,11 +54,10 @@ public class VoxelTile {
         this.depth = depth;
         this.boundsMin = boundsMin;
         this.boundsMax = boundsMax;
-        this.boundsMax[1] = cellHeight * 0xffff;
         this.cellSize = cellSize;
         this.cellHeight = cellHeight;
         this.borderSize = borderSize;
-        spanData = ensureEndianess(buffer, width, depth, VoxelFile.PREFERRED_BYTE_ORDER);
+        spanData = toByteArray(buffer, width, depth, VoxelFile.PREFERRED_BYTE_ORDER);
     }
 
     public VoxelTile(int tileX, int tileZ, Heightfield heightfield) {
@@ -164,7 +163,7 @@ public class VoxelTile {
         return data;
     }
 
-    private byte[] ensureEndianess(ByteBuffer buf, int width, int height, ByteOrder order) {
+    private byte[] toByteArray(ByteBuffer buf, int width, int height, ByteOrder order) {
         byte[] data = new byte[buf.limit()];
         if (buf.order() == order) {
             buf.get(data);

@@ -141,7 +141,6 @@ public class RecastDemo {
 
         DemoInputGeomProvider geom = loadInputMesh(getClass().getClassLoader().getResourceAsStream("nav_test.obj"));
         sample = new Sample(geom, Collections.emptyList(), null, settingsUI, dd);
-        toolsUI.setSample(sample);
         float timeAcc = 0;
         while (!glfwWindowShouldClose(window)) {
 
@@ -212,10 +211,11 @@ public class RecastDemo {
                 }
             } else if (settingsUI.isNavMeshInputTrigerred()) {
                 try (MemoryStack stack = stackPush()) {
-                    PointerBuffer aFilterPatterns = stack.mallocPointer(3);
+                    PointerBuffer aFilterPatterns = stack.mallocPointer(4);
                     aFilterPatterns.put(stack.UTF8("*.bin"));
                     aFilterPatterns.put(stack.UTF8("*.zip"));
                     aFilterPatterns.put(stack.UTF8("*.bytes"));
+                    aFilterPatterns.put(stack.UTF8("*.navmesh"));
                     aFilterPatterns.flip();
                     String filename = TinyFileDialogs.tinyfd_openFileDialog("Open Nav Mesh File", "", aFilterPatterns,
                             "Nav Mesh File", false);
@@ -287,10 +287,10 @@ public class RecastDemo {
                     if (inputGeom != null) {
                         hit = inputGeom.raycastMesh(rayStart, rayEnd);
                     }
-                    if (hit.isEmpty() && sample.getNavMesh() != null) {
+                    if (!hit.isPresent() && sample.getNavMesh() != null) {
                         hit = NavMeshRaycast.raycast(sample.getNavMesh(), rayStart, rayEnd);
                     }
-                    if (hit.isEmpty() && sample.getRecastResults() != null) {
+                    if (!hit.isPresent() && sample.getRecastResults() != null) {
                         hit = PolyMeshRaycast.raycast(sample.getRecastResults(), rayStart, rayEnd);
                     }
                     float[] rayDir = new float[] {rayEnd[0] - rayStart[0], rayEnd[1] - rayStart[1], rayEnd[2] - rayStart[2]};
@@ -362,6 +362,7 @@ public class RecastDemo {
                     cameraEulers[1] = -45;
                 }
                 sample.setChanged(false);
+                toolsUI.setSample(sample);
             }
             dd.fog(camr * 0.1f, camr * 1.25f);
             renderer.render(sample);
@@ -558,7 +559,6 @@ public class RecastDemo {
     private DemoInputGeomProvider loadInputMesh(InputStream stream) {
         DemoInputGeomProvider geom = new ObjImporter().load(stream);
         sample = new Sample(geom, Collections.emptyList(), null, settingsUI, dd);
-        toolsUI.setSample(sample);
         toolsUI.setEnabled(true);
         return geom;
     }
@@ -568,7 +568,7 @@ public class RecastDemo {
         if (filename.endsWith(".zip") || filename.endsWith(".bytes")) {
             UnityAStarPathfindingImporter importer = new UnityAStarPathfindingImporter();
             mesh = importer.load(file)[0];
-        } else if (filename.endsWith(".bin")) {
+        } else if (filename.endsWith(".bin") || filename.endsWith(".navmesh")) {
             MeshSetReader reader = new MeshSetReader();
             try (FileInputStream fis = new FileInputStream(file)) {
                 mesh = reader.read(fis, 6);
@@ -576,7 +576,6 @@ public class RecastDemo {
         }
         if (mesh != null) {
             sample = new Sample(null, Collections.emptyList(), mesh, settingsUI, dd);
-            toolsUI.setSample(sample);
             toolsUI.setEnabled(true);
         }
     }

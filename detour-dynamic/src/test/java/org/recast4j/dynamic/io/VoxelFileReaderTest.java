@@ -44,13 +44,12 @@ public class VoxelFileReaderTest {
             assertEquals(20f, f.maxEdgeLen, 0f);
             assertEquals(2f, f.maxSimplificationError, 0f);
             assertEquals(2f, f.minRegionArea, 0f);
-            assertEquals(1, f.tileCount);
             assertEquals(1, f.tiles.size());
             assertEquals(0.001f, f.tiles.get(0).cellHeight, 0f);
             assertEquals(810, f.tiles.get(0).width);
             assertEquals(810, f.tiles.get(0).depth);
             assertArrayEquals(new float[] { -101.25f, 0f, -101.25f }, f.tiles.get(0).boundsMin, 0f);
-            assertArrayEquals(new float[] { 101.25f, 65.535f, 101.25f }, f.tiles.get(0).boundsMax, 0f);
+            assertArrayEquals(new float[] { 101.25f, 5.0f, 101.25f }, f.tiles.get(0).boundsMax, 0f);
 
         }
     }
@@ -69,13 +68,12 @@ public class VoxelFileReaderTest {
             assertEquals(20f, f.maxEdgeLen, 0f);
             assertEquals(2f, f.maxSimplificationError, 0f);
             assertEquals(2f, f.minRegionArea, 0f);
-            assertEquals(100, f.tileCount);
             assertEquals(100, f.tiles.size());
             assertEquals(0.001f, f.tiles.get(0).cellHeight, 0f);
             assertEquals(90, f.tiles.get(0).width);
             assertEquals(90, f.tiles.get(0).depth);
             assertArrayEquals(new float[] { -101.25f, 0f, -101.25f }, f.tiles.get(0).boundsMin, 0f);
-            assertArrayEquals(new float[] { -78.75f, 65.535f, -78.75f }, f.tiles.get(0).boundsMax, 0f);
+            assertArrayEquals(new float[] { -78.75f, 5.0f, -78.75f }, f.tiles.get(0).boundsMax, 0f);
 
         }
     }

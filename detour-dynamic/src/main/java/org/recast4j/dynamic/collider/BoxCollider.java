@@ -19,7 +19,7 @@ freely, subject to the following restrictions:
 package org.recast4j.dynamic.collider;
 
 import org.recast4j.recast.Heightfield;
-import org.recast4j.recast.RecastShapeRasterization;
+import org.recast4j.recast.RecastFilledVolumeRasterization;
 import org.recast4j.recast.RecastVectors;
 import org.recast4j.recast.Telemetry;
 
@@ -27,10 +27,6 @@ public class BoxCollider extends AbstractCollider {
 
     private final float[] center;
     private final float[][] halfEdges;
-
-    public BoxCollider(float[] center, float[] extent, float[] forward, float[] up, int area, float flagMergeThreshold) {
-        this(center, getHalfEdges(up, forward, extent), area, flagMergeThreshold);
-    }
 
     public BoxCollider(float[] center, float[][] halfEdges, int area, float flagMergeThreshold) {
         super(area, flagMergeThreshold, bounds(center, halfEdges));
@@ -60,16 +56,16 @@ public class BoxCollider extends AbstractCollider {
 
     @Override
     public void rasterize(Heightfield hf, Telemetry telemetry) {
-        RecastShapeRasterization.rasterizeBox(hf, center, halfEdges, area, (int) Math.floor(flagMergeThreshold / hf.ch),
+        RecastFilledVolumeRasterization.rasterizeBox(hf, center, halfEdges, area, (int) Math.floor(flagMergeThreshold / hf.ch),
                 telemetry);
     }
 
-    private static float[][] getHalfEdges(float[] up, float[] forward, float[] extent) {
+    public static float[][] getHalfEdges(float[] up, float[] forward, float[] extent) {
         float[][] halfEdges = new float[][] { new float[3], new float[] { up[0], up[1], up[2] }, new float[3] };
         RecastVectors.normalize(halfEdges[1]);
-        RecastVectors.cross(halfEdges[0], forward, up);
+        RecastVectors.cross(halfEdges[0], up, forward);
         RecastVectors.normalize(halfEdges[0]);
-        RecastVectors.cross(halfEdges[2], up, halfEdges[0]);
+        RecastVectors.cross(halfEdges[2], halfEdges[0], up);
         RecastVectors.normalize(halfEdges[2]);
         halfEdges[0][0] *= extent[0];
         halfEdges[0][1] *= extent[0];

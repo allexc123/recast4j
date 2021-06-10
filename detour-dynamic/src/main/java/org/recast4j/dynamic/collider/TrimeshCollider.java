@@ -27,10 +27,29 @@ public class TrimeshCollider extends AbstractCollider {
     private final float[] vertices;
     private final int[] triangles;
 
+    public TrimeshCollider(float[] vertices, int[] triangles, int area, float flagMergeThreshold) {
+        super(area, flagMergeThreshold, computeBounds(vertices));
+        this.vertices = vertices;
+        this.triangles = triangles;
+    }
+
     public TrimeshCollider(float[] vertices, int[] triangles, float[] bounds, int area, float flagMergeThreshold) {
         super(area, flagMergeThreshold, bounds);
         this.vertices = vertices;
         this.triangles = triangles;
+    }
+
+    static float[] computeBounds(float[] vertices) {
+        float[] bounds = new float[] { vertices[0], vertices[1], vertices[2], vertices[0], vertices[1], vertices[2] };
+        for (int i = 3; i < vertices.length; i += 3) {
+            bounds[0] = Math.min(bounds[0], vertices[i]);
+            bounds[1] = Math.min(bounds[1], vertices[i + 1]);
+            bounds[2] = Math.min(bounds[2], vertices[i + 2]);
+            bounds[3] = Math.max(bounds[3], vertices[i]);
+            bounds[4] = Math.max(bounds[4], vertices[i + 1]);
+            bounds[5] = Math.max(bounds[5], vertices[i + 2]);
+        }
+        return bounds;
     }
 
     @Override
